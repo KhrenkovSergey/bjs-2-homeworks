@@ -1,27 +1,23 @@
 class AlarmClock {
     constructor() {
       this.alarmCollection = [];
-      this.timerId = null;
+      this.intervalId;
     }
   
-    addClock(time, callback, id) {
-      if (id === undefined) {
-        throw new Error('error text');
-      }
-      if (this.alarmCollection.some(item => item.id === id)) {
+    addClock(time, callback) {
+      if (this.alarmCollection.some(item => item.time === time)) {
         console.error('Такой будильник уже существует');
         return;
       }
       this.alarmCollection.push({
-        id,
         time,
         callback,
         canCall: true
       });
     }
   
-    removeClock(id) {
-      let index = this.alarmCollection.findIndex(item => item.id === id);
+    removeClock(time) {
+      let index = this.alarmCollection.findIndex(item => item.time === time);
       if (index === -1) {
         return false;
       }
@@ -31,14 +27,16 @@ class AlarmClock {
   
     getCurrentFormattedTime() {
       let date = new Date();
-      let hours = date.getHours();
-      let minutes = date.getMinutes();
-      if (hours < 10) {
-        hours = '0' + hours;
-      }
-      if (minutes < 10) {
-        minutes = '0' + minutes;
-      }
+      let hours = date.getHours().toString().padStart(2, '0');
+      let minutes = date.getMinutes().toString().padStart(2, '0');
+      // let hours = date.getHours();
+      // let minutes = date.getMinutes();
+      // if (hours < 10) {
+      //   hours = '0' + hours;
+      // }
+      // if (minutes < 10) {
+      //   minutes = '0' + minutes;
+      // }
       return `${hours}:${minutes}`;
     }
   
@@ -49,8 +47,8 @@ class AlarmClock {
           alarm.callback();
         }
       };
-      if (this.timerId === null) {
-        this.timerId = setInterval(() => {
+      if (this.intervalId === undefined) {
+        this.intervalId = setInterval(() => {
           this.alarmCollection.forEach(alarm => checkClock(alarm));
         }, 1000);
       }
@@ -73,3 +71,4 @@ class AlarmClock {
     }
     
   }
+
