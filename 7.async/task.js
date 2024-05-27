@@ -1,74 +1,75 @@
+
+
 class AlarmClock {
-    constructor() {
+  constructor() {
       this.alarmCollection = [];
-      this.intervalId;
-    }
-  
-    addClock(time, callback) {
-      if (this.alarmCollection.some(item => item.time === time)) {
-        console.error('Такой будильник уже существует');
-        return;
-      }
-      this.alarmCollection.push({
-        time,
-        callback,
-        canCall: true
-      });
-    }
-  
-    removeClock(time) {
-      let index = this.alarmCollection.findIndex(item => item.time === time);
-      if (index === -1) {
-        return false;
-      }
-      this.alarmCollection.splice(index, 1);
-      return true;
-    }
-  
-    getCurrentFormattedTime() {
-      let date = new Date();
-      let hours = date.getHours().toString().padStart(2, '0');
-      let minutes = date.getMinutes().toString().padStart(2, '0');
-      // let hours = date.getHours();
-      // let minutes = date.getMinutes();
-      // if (hours < 10) {
-      //   hours = '0' + hours;
-      // }
-      // if (minutes < 10) {
-      //   minutes = '0' + minutes;
-      // }
-      return `${hours}:${minutes}`;
-    }
-  
-    start() {
-      let checkClock = (alarm) => {
-        if (alarm.time === this.getCurrentFormattedTime() && alarm.canCall) {
-          alarm.canCall = false;
-          alarm.callback();
-        }
-      };
-      if (this.intervalId === undefined) {
-        this.intervalId = setInterval(() => {
-          this.alarmCollection.forEach(alarm => checkClock(alarm));
-        }, 1000);
-      }
-    }
-  
-    stop() {
-      if (this.timerId !== null) {
-        clearInterval(this.timerId);
-        this.timerId = null;
-      }
-    }
-  
-    resetAllCalls() {
-      this.alarmCollection.forEach(alarm => alarm.canCall = true);
-    }
-  
-    clearAlarms() {
-      this.stop();
-      this.alarmCollection = [];
-    }
-    
+      this.intervalId = null;
   }
 
+  addClock(time, callback) {
+      if (!time || !callback) {
+          throw new Error('Отсутствуют обязательные аргументы');
+      }
+
+      if (this.alarmCollection.some(alarm => alarm.time === time)) {
+          console.warn('Уже присутствует звонок на это же время');
+          return;
+      }
+
+      this.alarmCollection.push({
+          time,
+          callback,
+          canCall: true
+      });
+  }
+
+  removeClock(time) {
+      this.alarmCollection = this.alarmCollection.filter(alarm => alarm.time !== time);
+  }
+
+  getCurrentFormattedTime() {
+      const date = new Date();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+  }
+
+  start() {
+      if (this.intervalId !== null) {
+          return;
+      }
+
+      const checkClock = (alarm) => {
+          if (alarm.time === this.getCurrentFormattedTime() && alarm.canCall) {
+              alarm.canCall = false;
+              alarm.callback();
+          }
+      };
+
+      this.intervalId = setInterval(() => {
+          this.alarmCollection.forEach(alarm => checkClock(alarm));
+      }, 1000);
+  }
+
+  stop() {
+      if (this.intervalId !== null) {
+          clearInterval(this.intervalId);
+          this.intervalId = null;
+      }
+  }
+
+  resetAllCalls() {
+      this.alarmCollection.forEach(alarm => alarm.canCall = true);
+  }
+
+  clearAlarms() {
+      this.stop();
+      this.alarmCollection = [];
+  }
+}
+
+
+// const myAlarm = new AlarmClock();
+// myAlarm.addClock('08:30', () => console.log('Пора вставать!'));
+// myAlarm.addClock('08:31', () => console.log('Серьезно, пора вставать!'));
+// myAlarm.start();
