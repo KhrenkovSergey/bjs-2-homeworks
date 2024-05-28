@@ -95,7 +95,7 @@ class PrintEditionItem {
         if (this.books[i].name === bookName) {
           const removedBook = this.books.splice(i, 1);
           // console.log(removedBook);
-          return removedBook[0].name;
+          return removedBook[0];
         }
       }
       return null;
