@@ -13,7 +13,6 @@ class AlarmClock {
 
       if (this.alarmCollection.some(alarm => alarm.time === time)) {
           console.warn('Уже присутствует звонок на это же время');
-          return;
       }
 
       this.alarmCollection.push({
@@ -52,10 +51,8 @@ class AlarmClock {
   }
 
   stop() {
-      if (this.intervalId !== null) {
-          clearInterval(this.intervalId);
-          this.intervalId = null;
-      }
+    clearInterval(this.intervalId);
+    this.intervalId = null;
   }
 
   resetAllCalls() {
